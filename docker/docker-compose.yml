@@ -7,13 +7,15 @@ services:
       args:
         PUID: ${PUID}
         PGID: ${PGID}
-    image: qrcode:1.0
+    image: qrcode:1.0.0.4
     container_name: qrcode
     restart: "unless-stopped"
     networks:
       - qrcode_network
+      - traefik-proxy
     ports:
-      - "8080:80"
+    #  - "8080:80" # Originally at 8080
+      - "80" #take advantage of Traefik
     user: "${PUID}:${PGID}"
     environment:
       ADMIN_USER: "superadmin"
@@ -27,6 +29,16 @@ services:
     volumes:
       - ./data/app/config:/var/www/html/config
       - ./data/app/saved_qrcode:/var/www/html/saved_qrcode
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qrcode.entrypoints=http"
+      - "traefik.http.routers.qrcode.rule=Host(`qr.$DOMAINNAME`)"
+      - "traefik.http.routers.qrcode.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.qrcode-secure.entrypoints=https"
+      - "traefik.http.routers.qrcode-secure.rule=Host(`qr.$DOMAINNAME`)"
+      - "traefik.http.routers.qrcode-secure.tls=true"
+      - "traefik.http.routers.qrcode-secure.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.qrcode-secure.service=qrcode-docker"
 
   mariadb:
     image: mariadb:10.5
@@ -45,7 +57,10 @@ services:
     ports:
       - 3306:3306
 
+########################### networks
 networks:
   qrcode_network:
     driver: bridge
     name: qrcode
+  traefik-proxy:
+    external: true
