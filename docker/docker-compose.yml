@@ -7,7 +7,7 @@ services:
       args:
         PUID: ${PUID}
         PGID: ${PGID}
-    image: qrcode:1.0.0.4
+    image: qrcode:1.0.0.3
     container_name: qrcode
     restart: "unless-stopped"
     networks:
