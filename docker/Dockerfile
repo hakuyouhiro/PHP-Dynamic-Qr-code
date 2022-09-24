@@ -1,5 +1,5 @@
 FROM php:7.4.21-apache
-ARG APP_VERSION=v1.0.0Do
+ARG APP_VERSION=v1.0.0.3
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends less nano tini curl tar git zip unzip && \
@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean -y
 
-RUN curl -SL -o app.tar.gz "https://github.com/giandonatoinverso/PHP-Dynamic-Qr-code/archive/${APP_VERSION}.tar.gz"  \
+RUN curl -SL -o app.tar.gz "https://github.com/hakuyouhiro/PHP-Dynamic-Qr-code/archive/${APP_VERSION}.tar.gz"  \
     && mkdir -p /app \
     && tar xvf app.tar.gz -C /app --strip-components=1 \
     && cp -r /app/qrcode/** /var/www/html \
